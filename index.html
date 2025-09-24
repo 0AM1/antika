@@ -166,6 +166,10 @@
             background: rgba(0, 255, 100, 0.3);
         }
 
+        .copy-icon.animate {
+            transform: rotate(360deg);
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 10px;
@@ -185,7 +189,7 @@
 <body>
     <div class="container">
         <div class="window">
-            <textarea id="input" placeholder="הזן טקסט בעברית (לדוגמה: גרוק)"></textarea>
+            <textarea id="input" placeholder="הזן טקסט בעברית (לדוגמה: גרוק) או פיניקית (לדוגמה: 𐤂𐤓𐤅𐤊)"></textarea>
         </div>
         <div class="button-container">
             <button onclick="convertText()">
@@ -198,7 +202,7 @@
             <div class="button-container">
                 <button class="copy-button" onclick="copyToClipboard()">
                     <span>העתק ללוח</span>
-                    <span class="convert-icon">📋</span>
+                    <span class="copy-icon">📋</span>
                 </button>
             </div>
         </div>
@@ -212,18 +216,43 @@
             'צ': '𐤑', 'ץ': '𐤑', 'ק': '𐤒', 'ר': '𐤓', 'ש': '𐤔', 'ת': '𐤕'
         };
 
+        const phoenicianToHebrew = {
+            '𐤀': 'א', '𐤁': 'ב', '𐤂': 'ג', '𐤃': 'ד', '𐤄': 'ה', '𐤅': 'ו', '𐤆': 'ז',
+            '𐤇': 'ח', '𐤈': 'ט', '𐤉': 'י', '𐤊': 'כ', '𐤋': 'ל', '𐤌': 'מ', '𐤍': 'נ',
+            '𐤎': 'ס', '𐤏': 'ע', '𐤐': 'פ', '𐤑': 'צ', '𐤒': 'ק', '𐤓': 'ר', '𐤔': 'ש', '𐤕': 'ת'
+        };
+
         function convertText() {
-            const input = document.getElementById('input').value;
-            const buttonIcon = document.querySelector('.convert-icon');
+            const input = document.getElementById('input').value.trim();
+            const buttonIcon = document.querySelector('button[onclick="convertText()"] .convert-icon');
             
-            // Trigger animation
+            // Trigger animation for Convert button
             buttonIcon.classList.add('animate');
             setTimeout(() => buttonIcon.classList.remove('animate'), 500);
 
-            // Convert text
-            let result = '';
+            // Find the first character that is in either mapping
+            let isHebrewInput = false;
             for (let char of input) {
-                result += hebrewToPhoenician[char] || char;
+                if (hebrewToPhoenician[char]) {
+                    isHebrewInput = true;
+                    break;
+                } else if (phoenicianToHebrew[char]) {
+                    isHebrewInput = false;
+                    break;
+                }
+            }
+
+            let result = '';
+            if (isHebrewInput) {
+                // Convert Hebrew to Phoenician
+                for (let char of input) {
+                    result += hebrewToPhoenician[char] || char;
+                }
+            } else {
+                // Convert Phoenician to Hebrew
+                for (let char of input) {
+                    result += phoenicianToHebrew[char] || char;
+                }
             }
 
             // Display result
@@ -232,6 +261,12 @@
 
         function copyToClipboard() {
             const output = document.getElementById('output').textContent;
+            const copyIcon = document.querySelector('.copy-button .copy-icon');
+            
+            // Trigger animation for Copy button
+            copyIcon.classList.add('animate');
+            setTimeout(() => copyIcon.classList.remove('animate'), 500);
+
             navigator.clipboard.writeText(output).then(() => {
                 const copyButton = document.querySelector('.copy-button');
                 copyButton.classList.add('copied');
