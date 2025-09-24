@@ -17,7 +17,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background: linear-gradient(135deg, #274c91, #290967);
             padding: 20px;
         }
 
@@ -66,6 +66,31 @@
 
         .button-container {
             text-align: center;
+        }
+
+        .copy-button {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+        }
+
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .copy-button:active {
+            transform: translateY(0);
+        }
+
+        .copy-button.copied {
+            background: rgba(0, 255, 100, 0.3);
         }
 
         button {
@@ -128,6 +153,7 @@
             </button>
         </div>
         <div class="window output" id="output">𐤂𐤓𐤅𐤊</div>
+        <button class="copy-button" onclick="copyToClipboard()">העתק</button>
     </div>
 
     <script>
@@ -151,7 +177,16 @@
             for (let char of input) {
                 result += hebrewToPhoenician[char] || char;
             }
-
+            
+            // Copy text to Clipboard
+            function copyToClipboard() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+            const copyButton = document.querySelector('.copy-button');
+            copyButton.classList.add('copied');
+            setTimeout(() => copyButton.classList.remove('copied'), 1000);
+              });
+}
             // Display result
             document.getElementById('output').textContent = result || '𐤂𐤓𐤅𐤊';
         }
